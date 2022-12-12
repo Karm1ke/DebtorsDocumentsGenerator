@@ -4,12 +4,16 @@ namespace DBWorkLB
 {
     public class DebtorCourtcase
     {
-        public DateTime? PeriodStartDate { get; set; }
-        public DateTime? PeriodEndDate { get; set; }
         /// <summary>
-        /// Первоначальная сумма долга
+        /// Cумма долга
         /// </summary>
-        public decimal StartTotalDebtSum { get; set; }
+        public decimal DebtSum { get; set; }
+        public DateTime? DebtPeriodStartDate { get; set; }
+        public DateTime? DebtPeriodEndDate { get; set; }
+        /// <summary>
+        /// Общая сумма долга
+        /// </summary>
+        public decimal TotalDebtSum { get; set; }
         /// <summary>
         /// Номер дела
         /// </summary>
@@ -22,6 +26,8 @@ namespace DBWorkLB
         /// Взысканная сумма пенни
         /// </summary>
         public decimal RecoveredAmountPenny { get; set; }
+        public DateTime? PennyPeriodStartDate { get; set; }
+        public DateTime? PennyPeriodEndDate { get; set; }
         /// <summary>
         /// Взысканная сумма государственной пошлины
         /// </summary>

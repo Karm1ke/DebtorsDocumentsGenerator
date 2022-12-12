@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logging;
+using System;
 using System.Data;
 using System.Threading;
 
@@ -77,11 +78,11 @@ namespace MySqlLib
                 MyResult result = new MyResult();
                 Thread th = new Thread(delegate()
                 {
-                    using (MySql.Data.MySqlClient.MySqlConnection connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
+                    using (var connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
                     {
                         try
                         {
-                            MySql.Data.MySqlClient.MySqlCommand commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
+                            var commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
                             commRC.CommandTimeout = 5000;
                             if(!connRC.Ping())
                             {
@@ -103,6 +104,7 @@ namespace MySqlLib
                             }
                             catch (Exception ex)
                             {
+                                Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                                 result.ErrorText = ex.Message;
                                 result.HasError = true;
                             }
@@ -116,13 +118,16 @@ namespace MySqlLib
                             }
                             
                         }
-                        catch (System.TimeoutException)
+                        catch (System.TimeoutException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
                         catch (MySql.Data.MySqlClient.MySqlException ex)
                         {
+
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
@@ -166,11 +171,11 @@ namespace MySqlLib
                 MyResult result = new MyResult();
                 Thread th = new Thread(delegate()
                 {
-                    using (MySql.Data.MySqlClient.MySqlConnection connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
+                    using (var connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
                     {
                         try
                         {
-                            MySql.Data.MySqlClient.MySqlCommand commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
+                            var commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
                             commRC.CommandTimeout = 120;
                             if (!connRC.Ping())
                             {
@@ -196,13 +201,15 @@ namespace MySqlLib
                             }
                             
                         }
-                        catch (System.TimeoutException)
+                        catch (System.TimeoutException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
                         catch (MySql.Data.MySqlClient.MySqlException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
@@ -228,11 +235,11 @@ namespace MySqlLib
                 MyResult result = new MyResult();
                 Thread th = new Thread(delegate()
                 {
-                    using (MySql.Data.MySqlClient.MySqlConnection connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
+                    using (var connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
                     {
                         try
                         {
-                            MySql.Data.MySqlClient.MySqlCommand commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
+                            var commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
                             commRC.CommandTimeout = 120;
                             if (!connRC.Ping())
                             {
@@ -256,13 +263,16 @@ namespace MySqlLib
                            // connRC.Close();
                           //  connRC.ClearPoolAsync(connRC);
                         }
-                        catch (System.TimeoutException)
+                        catch (System.TimeoutException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
                         catch (MySql.Data.MySqlClient.MySqlException ex)
                         {
+
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
@@ -285,8 +295,8 @@ namespace MySqlLib
                 {
                     try
                     {
-                        MySql.Data.MySqlClient.MySqlConnection connRC = new MySql.Data.MySqlClient.MySqlConnection(connection);
-                        MySql.Data.MySqlClient.MySqlScript script = new MySql.Data.MySqlClient.MySqlScript(connRC, sql);
+                        var connRC = new MySql.Data.MySqlClient.MySqlConnection(connection);
+                        var script = new MySql.Data.MySqlClient.MySqlScript(connRC, sql);
                         
                         if (!connRC.Ping())
                         {
@@ -311,13 +321,17 @@ namespace MySqlLib
                         }
                         
                     }
-                    catch (System.TimeoutException)
+                    catch (System.TimeoutException ex)
                     {
+
+                        Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                         result.ErrorText = "Проверьте соединение с интернетом";
                         result.HasError = true;
                     }
                     catch (MySql.Data.MySqlClient.MySqlException ex)
                     {
+
+                        Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                         result.ErrorText = "Проверьте соединение с интернетом";
                         result.HasError = true;
                     }
@@ -398,7 +412,7 @@ namespace MySqlLib
               
                   Thread th = new Thread(delegate()
                 {
-                    using (MySql.Data.MySqlClient.MySqlConnection connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
+                    using (var connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
                     {
                         try
                         {
@@ -424,6 +438,7 @@ namespace MySqlLib
                             }
                             catch (Exception ex)
                             {
+                                Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                                 result.HasError = true;
                                 result.ErrorText = ex.Message;
                                 result.ReceivedException = ex;
@@ -438,20 +453,23 @@ namespace MySqlLib
                                 connRC.Close();
                             }                         
                         }
-                        catch (System.TimeoutException)
+                        catch (System.TimeoutException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
                         // проверьте соединение с Интернетом
                         catch (MySql.Data.MySqlClient.MySqlException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                             result.ReceivedException = ex;
                         }
                         catch (Exception ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = ex.Message;
                             result.HasError = true;
                             result.ReceivedException = ex;
@@ -495,11 +513,11 @@ namespace MySqlLib
                 MyResultData result = new MyResultData();
                 Thread th = new Thread(delegate()
                 {
-                    using (MySql.Data.MySqlClient.MySqlConnection connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
+                    using (var connRC = new MySql.Data.MySqlClient.MySqlConnection(connection))
                     {
                         try
                         {
-                            MySql.Data.MySqlClient.MySqlCommand commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
+                            var commRC = new MySql.Data.MySqlClient.MySqlCommand(sql, connRC);
                             commRC.CommandTimeout = 3000;
                             
                             if (!connRC.Ping())
@@ -510,19 +528,20 @@ namespace MySqlLib
                                 }
                                 catch(Exception ex)
                                 {
-
+                                    Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                                 }
                             }
 
                             try
                             {
-                                MySql.Data.MySqlClient.MySqlDataReader reader = commRC.ExecuteReader();
+                                var reader = commRC.ExecuteReader();
                                 DataTable dt1 = new DataTable();
                                 dt1.Load(reader);
                                 result.ResultData = dt1;
                             }
                             catch (Exception ex)
                             {
+                                Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                                 result.HasError = true;
                                 result.ErrorText = ex.Message;
                             }
@@ -536,14 +555,16 @@ namespace MySqlLib
                             }
                             
                         }
-                        catch (System.TimeoutException)
+                        catch (System.TimeoutException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }
                         // проверьте соединение с Интернетом
                         catch (MySql.Data.MySqlClient.MySqlException ex)
                         {
+                            Logger.Write($"Ошибка при выполнении запроса к БД: {ex.Message}; {ex.StackTrace}");
                             result.ErrorText = "Проверьте соединение с интернетом";
                             result.HasError = true;
                         }

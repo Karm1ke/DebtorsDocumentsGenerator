@@ -16,12 +16,14 @@ namespace DBWorkLB
             public static string selectDebtorsPassportData = "SELECT * FROM debtors_passport_data";
             public static string selectDebtorsCourtcase = @"
                     SELECT
-                        debtors_courtcases.period_start_date,
-	                    debtors_courtcases.period_end_date,
 	                    debtors_courtcases.start_total_debt_sum,
 	                    debtors_courtcases.case_number,
 	                    debtors_courtcases.recovered_main_amount_sum,
+                        CAST(debtors_courtcases.debt_period_start_date AS CHAR) AS debt_period_start_date,
+	                    CAST(debtors_courtcases.debt_period_end_date AS CHAR) AS debt_period_end_date,
 	                    debtors_courtcases.recovered_amount_penny,
+                        CAST(debtors_courtcases.penny_period_start_date AS CHAR) AS penny_period_start_date,
+	                    CAST(debtors_courtcases.penny_period_end_date AS CHAR) AS penny_period_end_date,
 	                    debtors_courtcases.recovered_government_duty,
 	                    CAST(debtors_courtcases.decision_date AS CHAR) AS desicion_date,
 	                    CAST(debtors_courtcases.decision_start_date AS CHAR) AS decision_start_date,
@@ -33,18 +35,23 @@ namespace DBWorkLB
 	                    CONCAT(debtors_passport_data.lastname, ' ', 
 	                    debtors_passport_data.name, ' ', 
 	                    debtors_passport_data.secondname) AS debtor_fio,
+                        debtors_passport_data.lastname,
+                        debtors_passport_data.name,
+                        debtors_passport_data.secondname,
 	                    debtors_passport_data.account_number,
 	                    debtors_passport_data.residence_place, 
 	                    debtors_passport_data.street,
 	                    debtors_passport_data.house_number,
 	                    debtors_passport_data.room_number,
 	                    debtors_passport_data.share_right,
-	                    debtors_courtcases.period_start_date,
-	                    debtors_courtcases.period_end_date,
-	                    debtors_courtcases.start_total_debt_sum,
-	                    debtors_courtcases.case_number,
 	                    debtors_courtcases.recovered_main_amount_sum,
+	                    debtors_courtcases.case_number,
+	                    debtors_courtcases.start_total_debt_sum,
+	                    CAST(debtors_courtcases.debt_period_start_date AS CHAR) AS debt_period_start_date,
+	                    CAST(debtors_courtcases.debt_period_end_date AS CHAR) AS debt_period_end_date,
 	                    debtors_courtcases.recovered_amount_penny,
+                        CAST(debtors_courtcases.penny_period_start_date AS CHAR) AS penny_period_start_date,
+	                    CAST(debtors_courtcases.penny_period_end_date AS CHAR) AS penny_period_end_date,
 	                    debtors_courtcases.recovered_government_duty,
 	                    CAST(debtors_courtcases.decision_date AS CHAR) AS desicion_date,
 	                    CAST(debtors_courtcases.decision_start_date AS CHAR) AS decision_start_date,
@@ -66,26 +73,27 @@ namespace DBWorkLB
             string frmt = "Загрузка таблицы {0}";
 
             infoWrite(string.Format(frmt, "Пользователи"));
-            var usersDt = 
-                DBOperations.getRows(Requests.selectUsers, false, TableNames.users);
+            var usersDt =
+                DBOperations.getRows(Requests.selectUsers, true, TableNames.users, NotifyOwner.LoginForm);
             if (usersDt != null)
             {
                 usersDt.TableName = "users";
             }
 
             infoWrite(string.Format(frmt, "Паспортные данные должников"));
-            var debtorsPassportDt = 
-                DBOperations.getRows(Requests.selectDebtorsPassportData, false, TableNames.debtors_passport_data);
+            var debtorsPassportDt =
+                DBOperations.getRows(Requests.selectDebtorsPassportData, true, TableNames.debtors_passport_data, NotifyOwner.LoginForm);
             if (debtorsPassportDt != null)
             {
                 debtorsPassportDt.TableName = "debtors_passport_data";
             }
 
             infoWrite(string.Format(frmt, "Данные по делам должников"));
-            var debtorsCourtCasesDt = 
-                DBOperations.getRows(Requests.selectDebtorsCourtcase, 
-                    false, 
-                    TableNames.debtors_courtcases);
+            var debtorsCourtCasesDt =
+                DBOperations.getRows(Requests.selectDebtorsCourtcase,
+                    true,
+                    TableNames.debtors_courtcases, 
+                    NotifyOwner.LoginForm);
             if (debtorsCourtCasesDt != null)
             {
                 debtorsCourtCasesDt.TableName = "debtors_courtcases";
@@ -93,25 +101,26 @@ namespace DBWorkLB
 
             infoWrite(string.Format(frmt, "Сводная таблица по должникам"));
             var debtorsCommonDt =
-              DBOperations.getRows(Requests.selectDebtorsCommon, 
-                    false, 
-                    TableNames.debtors_common_local);
+              DBOperations.getRows(Requests.selectDebtorsCommon,
+                    true,
+                    TableNames.debtors_common_local,
+                    NotifyOwner.LoginForm);
             if (debtorsCommonDt != null)
             {
                 debtorsCommonDt.TableName = "debtors_common_local";
             }
 
             infoWrite(string.Format(frmt, "Шаблоны"));
-            var templatesDt = 
-                DBOperations.getRows(Requests.selectTemplates, false, TableNames.templates);
+            var templatesDt =
+                DBOperations.getRows(Requests.selectTemplates, true, TableNames.templates, NotifyOwner.LoginForm);
             if (templatesDt != null)
             {
                 templatesDt.TableName = "templates";
             }
 
             infoWrite(string.Format(frmt, "Лог генерации документов"));
-            var generationLogDt = 
-                DBOperations.getRows(Requests.selectGenerationLog, false, TableNames.generation_log);
+            var generationLogDt =
+                DBOperations.getRows(Requests.selectGenerationLog, true, TableNames.generation_log, NotifyOwner.LoginForm);
             if (generationLogDt != null)
             {
                 generationLogDt.TableName = "generation_log";
@@ -149,6 +158,9 @@ namespace DBWorkLB
                             break;
                         case TableNames.debtors_common_local:
                             UpdateTableRequest(Requests.selectDebtorsCommon, tablename);
+                            break;
+                        case TableNames.templates:
+                            UpdateTableRequest(Requests.selectTemplates, tablename);
                             break;
                     }
                 }

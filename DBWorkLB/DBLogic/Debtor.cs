@@ -21,6 +21,7 @@ namespace DBWorkLB
         /// Отчество
         /// </summary>
         public string Secondname { get; set; }
+        public string FIO { get; set; }
         /// <summary>
         /// Пункт проживания
         /// </summary>
@@ -28,7 +29,7 @@ namespace DBWorkLB
         /// <summary>
         /// Номер дома
         /// </summary>
-        public int HouseNumber { get; set; }
+        public string HouseNumber { get; set; }
         /// <summary>
         /// Улица
         /// </summary>
@@ -40,10 +41,18 @@ namespace DBWorkLB
         /// <summary>
         /// Доля в праве
         /// </summary>
-        public int ShareRight { get; set; }
+        public string ShareRight { get; set; }
         /// <summary>
         /// Судебные дела
         /// </summary>
         public List<DebtorCourtcase> Courtcases { get; set; }
+
+        public Debtor()
+        {
+            if (string.IsNullOrEmpty(FIO))
+            {
+                FIO = $"{Lastname} {Name} {Secondname}".Trim();
+            }
+        }
     }
 }

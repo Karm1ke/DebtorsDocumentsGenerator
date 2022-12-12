@@ -1,6 +1,6 @@
 ﻿namespace DebtorsDocumentsGenerator
 {
-    partial class DBConnectionSettings
+    partial class DBConnectionSettingsForm
     {
         /// <summary>
         /// Required designer variable.

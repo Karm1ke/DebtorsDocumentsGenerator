@@ -5,14 +5,14 @@ using Application = System.Windows.Forms.Application;
 
 namespace AdvancedFunctions
 {
-    public class Settings
+    public class DBSettings
     {
         public string database { get; set; }
         public string ip_adress { get; set; }
         public string user { get; set; }
         public string password { get; set; }
 
-        public Settings(string database, string ip_adress, string user, string password)
+        public DBSettings(string database, string ip_adress, string user, string password)
         {
             this.database = database;
             this.ip_adress = ip_adress;
@@ -21,11 +21,11 @@ namespace AdvancedFunctions
         }
     }
 
-    public class Settings_Manager
+    public class DBSettings_Manager
     {
         private string filename = Application.StartupPath + "\\settings.conf";
 
-        public void Save(Settings settings)
+        public void Save(DBSettings settings)
         {
             using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Create)))
             {
@@ -37,13 +37,13 @@ namespace AdvancedFunctions
             }
         }
 
-        public Settings Load()
+        public DBSettings Load()
         {
             try
             {
                 if (File.Exists(filename))
                 {
-                    Settings rtnSetting = new Settings("", "", "", "");
+                    DBSettings rtnSetting = new DBSettings("", "", "", "");
                     using (StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open)))
                     {
                         rtnSetting.database = Util.AESSha1Crypter.Decrypt(sr.ReadLine(), "qwertyman");

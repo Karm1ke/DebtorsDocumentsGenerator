@@ -11,19 +11,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Settings = AdvancedFunctions.Settings;
+using DBSettings = AdvancedFunctions.DBSettings;
 
 namespace DebtorsDocumentsGenerator
 {
-    public partial class DBConnectionSettings : Form
+    public partial class DBConnectionSettingsForm : Form
     {
-        public DBConnectionSettings()
+        public DBConnectionSettingsForm()
         {
             InitializeComponent();
         }
 
         bool first_form;
-        public DBConnectionSettings(bool first_form)
+        public DBConnectionSettingsForm(bool first_form)
         {
             InitializeComponent();
             this.first_form = first_form;
@@ -38,8 +38,8 @@ namespace DebtorsDocumentsGenerator
         {
             try
             {
-                Settings_Manager sm = new Settings_Manager();
-                sm.Save(new Settings(database.Text, ip.Text, user.Text, password.Text));
+                DBSettings_Manager sm = new DBSettings_Manager();
+                sm.Save(new DBSettings(database.Text, ip.Text, user.Text, password.Text));
                 DBConnectState.source = string.Format(
                 "Database = {0}; DataSource = {1}; User Id = {2}; Password = {3}; charset=utf8;",
                 ip.Text, database.Text, user.Text, password.Text);
@@ -67,8 +67,8 @@ namespace DebtorsDocumentsGenerator
             {
                 if (File.Exists("settings.conf"))
                 {
-                    Settings_Manager sm = new Settings_Manager();
-                    Settings set = sm.Load();
+                    DBSettings_Manager sm = new DBSettings_Manager();
+                    DBSettings set = sm.Load();
                     database.Text = set.database;
                     ip.Text = set.ip_adress;
                     user.Text = set.user;
