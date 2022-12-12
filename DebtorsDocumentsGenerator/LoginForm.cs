@@ -1,16 +1,12 @@
 ﻿using AdvancedFunctions;
 using DBWorkLB;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using static AdvancedFunctions.InformOperations;
 
 namespace DebtorsDocumentsGenerator
 {
@@ -34,28 +30,86 @@ namespace DebtorsDocumentsGenerator
             InitializeComponent();
             ControlsExtPainting.SetTheme("Gray", this);
 
+            setDisplayLoginFormMessage = new InformOperations.SetDisplayMessage(InformationNotify);
+
             bw = new BackgroundWorker();
-            bw.DoWork += new DoWorkEventHandler(LoadDataTables);
+            bw.DoWork += new DoWorkEventHandler(DoWork);
             bw.WorkerReportsProgress = true;
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(LoadDataTableCompleted);
+            bw.WorkerSupportsCancellation = true;
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PostWork);
         }
 
-        private void LoadDataTableCompleted(object sender, RunWorkerCompletedEventArgs e)
+        /// <summary>
+        /// Вызов уведомления
+        /// </summary>
+        /// <param name="text">Текст уведомления</param>
+        private void InformationNotify(string text, string title = "Генератор документов: возникла проблема", ToolTipIcon icon = ToolTipIcon.Error)
         {
-            if (statusStrip.InvokeRequired)
+            try
             {
-                statusStrip.Invoke((MethodInvoker)delegate ()
+                if (loginNotify != null)
                 {
-                    MainForm MainForm = new MainForm();
-                    this.Visible = false;
-                    MainForm.Show();
-                });
+                    loginNotify.ShowBalloonTip(3000, title, text, icon);
+                }
+            }
+            catch (Exception ex)
+            {
+                InformOperations.setDisplayMessage($"MainForm (InformationNotify): ${ex.Message}", this.Name);
             }
         }
 
-        private void LoadDataTables(object sender, DoWorkEventArgs e)
+        private void DoWork(object sender, DoWorkEventArgs e)
         {
-            DBSourceLogic.LoadDataTables(new Action<string>((s) => { infoWrite(s); }));
+            try
+            {
+                if (e.Argument != null && e.Argument is string[])
+                {
+                    var loginData = (string[])e.Argument;
+                    if (loginData.Length == 2)
+                    {
+                        if (DBSource.mainDataSet == null || DBSource.mainDataSet?.Tables.Count == 0)
+                        {
+                            DBSourceLogic.LoadDataTables(new Action<string>((s) => { infoWrite(s); }));
+                        }
+                        if (DBSource.usersDt.Rows.Count > 0)
+                        {
+                            var authUserRows = DBSource.usersDt.Select($"login = '{loginData[0]}' AND password = '{loginData[1]}'");
+                            if (authUserRows.Length > 0)
+                            {
+                                e.Result = true;
+                            }
+                            else
+                            {
+                                setDisplayLoginFormMessage("Такая комбинация логина и пароля не найдена", "Неудачная авторизация", icon: ToolTipIcon.Warning);
+                            }
+                        }
+                        else
+                        {
+                            setDisplayLoginFormMessage("Список пользователей для авторизации пуст", icon: ToolTipIcon.Warning);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                InformOperations.setDisplayMessage($"Ошибка при загрузке таблиц: {ex.Message}");
+            }
+        }
+
+        private void PostWork(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result != null && (bool)e.Result)
+            {
+                if (statusStrip.InvokeRequired)
+                {
+                    statusStrip.Invoke((MethodInvoker)delegate ()
+                    {
+                        MainForm MainForm = new MainForm();
+                        this.Visible = false;
+                        MainForm.Show();
+                    });
+                }
+            }
         }
 
         void retrieveThreadBefore(Thread th)
@@ -72,9 +126,23 @@ namespace DebtorsDocumentsGenerator
                 {
                     statusStrip.Invoke((MethodInvoker)delegate () { infoLbl.Visible = true; });
                 }
-                if (bw != null)
+                if (bw != null && !bw.IsBusy)
                 {
-                    bw.RunWorkerAsync();
+                    string login = "";
+                    string password = "";
+                    Action act = new Action(delegate {
+                        login = loginTextBox.Text;
+                        password = passwordTextBox.Text;
+                    });
+                    if (this.InvokeRequired)
+                    {
+                        this.Invoke(act);
+                    }
+                    else
+                    {
+                        act();
+                    }
+                    bw.RunWorkerAsync(new string[] { login, password });
                 }
             }
         }
@@ -111,8 +179,12 @@ namespace DebtorsDocumentsGenerator
             switch (e.KeyCode)
             {
                 case Keys.F2:
-                    var mysql_settings = new DBConnectionSettings();
+                    var mysql_settings = new DBConnectionSettingsForm();
                     mysql_settings.Show();
+                    break;
+                case Keys.F3:
+                    var ftp_settings = new FTPConnectionSettingsForm();
+                    ftp_settings.Show();
                     break;
                 case Keys.Enter:
                     AuthStart();
@@ -124,8 +196,8 @@ namespace DebtorsDocumentsGenerator
         {
             if (File.Exists("settings.conf"))
             {
-                Settings_Manager sm = new Settings_Manager();
-                Settings set = sm.Load();
+                DBSettings_Manager sm = new DBSettings_Manager();
+                DBSettings set = sm.Load();
                 DBConnectState.source =
                     @"Database=" + set.database +
                     @";DataSource=" + set.ip_adress +
@@ -137,6 +209,19 @@ namespace DebtorsDocumentsGenerator
         private void LoginForm_Load(object sender, EventArgs e)
         {
             MySQLSettingsLoad();
+        }
+
+        private void mainNotify_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (bw.IsBusy)
+            {
+                bw.CancelAsync();
+            }
         }
     }
 }
