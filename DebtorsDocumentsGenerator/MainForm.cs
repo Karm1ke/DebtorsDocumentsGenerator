@@ -104,7 +104,10 @@ namespace DebtorsDocumentsGenerator
         {
             try
             {
-                mainNotify.ShowBalloonTip(3000, title, text, icon);
+                if (mainNotify != null)
+                {
+                    mainNotify.ShowBalloonTip(3000, title, text, icon);
+                }
             }
             catch (Exception ex)
             {
@@ -193,11 +196,30 @@ namespace DebtorsDocumentsGenerator
             SelectTab("templatesTab");
         }
 
+
+        private void settingsLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            if (mainPanel.Controls.Count > 0)
+            {
+                mainPanel.Controls.Clear();
+            }
+            var sc = new SettingsControl();
+            sc.Dock = DockStyle.Fill;
+            mainPanel.Controls.Add(sc);
+            settingsLink.ForeColor = Color.Black;
+            SelectTab("settingsTab");
+        }
+
         private void logoutLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             this.Hide();
             LoginForm lf = new LoginForm();
             lf.Show();
+        }
+
+        private void mainNotify_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }

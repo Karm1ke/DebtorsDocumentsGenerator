@@ -92,14 +92,14 @@
             // 
             this.settingsLink.AutoSize = true;
             this.settingsLink.BackColor = System.Drawing.SystemColors.Control;
-            this.settingsLink.Enabled = false;
-            this.settingsLink.LinkColor = System.Drawing.Color.Gainsboro;
+            this.settingsLink.LinkColor = System.Drawing.Color.Black;
             this.settingsLink.Location = new System.Drawing.Point(48, 6);
             this.settingsLink.Name = "settingsLink";
             this.settingsLink.Size = new System.Drawing.Size(62, 13);
             this.settingsLink.TabIndex = 3;
             this.settingsLink.TabStop = true;
             this.settingsLink.Text = "Настройки";
+            this.settingsLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.settingsLink_LinkClicked);
             // 
             // mainPanel
             // 
@@ -167,6 +167,7 @@
             // 
             this.mainNotify.Icon = ((System.Drawing.Icon)(resources.GetObject("mainNotify.Icon")));
             this.mainNotify.Visible = true;
+            this.mainNotify.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.mainNotify_MouseDoubleClick);
             // 
             // MainForm
             // 

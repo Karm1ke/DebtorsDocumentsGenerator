@@ -40,6 +40,10 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Word.15.0.4797.1004\lib\net20\Microsoft.Office.Interop.Word.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -53,6 +57,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateDocuments Logic\ParamValues.cs" />
+    <Compile Include="CreateDocuments Logic\WordOperations.cs" />
+    <Compile Include="CreateTemplateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateTemplateForm.Designer.cs">
+      <DependentUpon>CreateTemplateForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FTPConnectionSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FTPConnectionSettingsForm.Designer.cs">
+      <DependentUpon>FTPConnectionSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateChoice.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TemplateChoice.Designer.cs">
+      <DependentUpon>TemplateChoice.cs</DependentUpon>
+    </Compile>
     <Compile Include="ControlsExtPainting.cs" />
     <Compile Include="Controls\Buttons\CustomButton.cs">
       <SubType>Component</SubType>
@@ -72,11 +96,11 @@
     <Compile Include="Controls\Panels\DebtorListControl.Designer.cs">
       <DependentUpon>DebtorListControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="DBConnectionSettings.cs">
+    <Compile Include="DBConnectionSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DBConnectionSettings.Designer.cs">
-      <DependentUpon>DBConnectionSettings.cs</DependentUpon>
+    <Compile Include="DBConnectionSettingsForm.Designer.cs">
+      <DependentUpon>DBConnectionSettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ImportDebtors Logic\ImportDebtorsOperations.cs" />
     <Compile Include="ImportDebtors Logic\ReadFileOperations.cs" />
@@ -106,14 +130,26 @@
     <Compile Include="Controls\Panels\TemplatesListControl.Designer.cs">
       <DependentUpon>TemplatesListControl.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Controls\Panels\SettingsControl.resx">
+      <DependentUpon>SettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateTemplateForm.resx">
+      <DependentUpon>CreateTemplateForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FTPConnectionSettingsForm.resx">
+      <DependentUpon>FTPConnectionSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TemplateChoice.resx">
+      <DependentUpon>TemplateChoice.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\Panels\DebtorListControl.resx">
       <DependentUpon>DebtorListControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Panels\TemplatesListControl.resx">
       <DependentUpon>TemplatesListControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DBConnectionSettings.resx">
-      <DependentUpon>DBConnectionSettings.cs</DependentUpon>
+    <EmbeddedResource Include="DBConnectionSettingsForm.resx">
+      <DependentUpon>DBConnectionSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
@@ -155,5 +191,6 @@
       <Name>DBWorkLB</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
