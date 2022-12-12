@@ -30,8 +30,8 @@
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.templates_dg = new System.Windows.Forms.DataGridView();
-            this.customButton1 = new DebtorsDocumentsGenerator.CustomButton();
-            this.customButton2 = new DebtorsDocumentsGenerator.CustomButton();
+            this.createTemplateButton = new DebtorsDocumentsGenerator.CustomButton();
+            this.deleteTemplateButton = new DebtorsDocumentsGenerator.CustomButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -58,41 +58,48 @@
             // 
             this.templates_dg.AllowUserToAddRows = false;
             this.templates_dg.AllowUserToDeleteRows = false;
+            this.templates_dg.AllowUserToResizeRows = false;
             this.templates_dg.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.templates_dg.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.templates_dg.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.templates_dg.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.templates_dg.Location = new System.Drawing.Point(0, 0);
             this.templates_dg.Name = "templates_dg";
             this.templates_dg.ReadOnly = true;
+            this.templates_dg.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.templates_dg.Size = new System.Drawing.Size(439, 302);
             this.templates_dg.TabIndex = 1;
+            this.templates_dg.KeyDown += new System.Windows.Forms.KeyEventHandler(this.templates_dg_KeyDown);
             // 
-            // customButton1
+            // createTemplateButton
             // 
-            this.customButton1.Location = new System.Drawing.Point(4, 3);
-            this.customButton1.Name = "customButton1";
-            this.customButton1.Size = new System.Drawing.Size(125, 41);
-            this.customButton1.TabIndex = 7;
-            this.customButton1.Text = "Импорт шаблона";
-            this.customButton1.UseVisualStyleBackColor = true;
+            this.createTemplateButton.Location = new System.Drawing.Point(4, 3);
+            this.createTemplateButton.Name = "createTemplateButton";
+            this.createTemplateButton.Size = new System.Drawing.Size(125, 41);
+            this.createTemplateButton.TabIndex = 7;
+            this.createTemplateButton.Text = "Импорт шаблона";
+            this.createTemplateButton.UseVisualStyleBackColor = true;
+            this.createTemplateButton.Click += new System.EventHandler(this.createTemplateButton_Click);
             // 
-            // customButton2
+            // deleteTemplateButton
             // 
-            this.customButton2.Location = new System.Drawing.Point(524, 3);
-            this.customButton2.Name = "customButton2";
-            this.customButton2.Size = new System.Drawing.Size(125, 41);
-            this.customButton2.TabIndex = 8;
-            this.customButton2.Text = "Удалить";
-            this.customButton2.UseVisualStyleBackColor = true;
+            this.deleteTemplateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.deleteTemplateButton.Location = new System.Drawing.Point(524, 3);
+            this.deleteTemplateButton.Name = "deleteTemplateButton";
+            this.deleteTemplateButton.Size = new System.Drawing.Size(125, 41);
+            this.deleteTemplateButton.TabIndex = 8;
+            this.deleteTemplateButton.Text = "Удалить";
+            this.deleteTemplateButton.UseVisualStyleBackColor = true;
+            this.deleteTemplateButton.Click += new System.EventHandler(this.deleteTemplateButton_Click);
             // 
             // TemplatesListControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.customButton2);
-            this.Controls.Add(this.customButton1);
+            this.Controls.Add(this.deleteTemplateButton);
+            this.Controls.Add(this.createTemplateButton);
             this.Controls.Add(this.splitContainer1);
             this.Name = "TemplatesListControl";
             this.Size = new System.Drawing.Size(657, 357);
@@ -108,7 +115,7 @@
         #endregion
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataGridView templates_dg;
-        private CustomButton customButton1;
-        private CustomButton customButton2;
+        private CustomButton createTemplateButton;
+        private CustomButton deleteTemplateButton;
     }
 }

@@ -84,6 +84,7 @@
             this.generateButton.TabIndex = 4;
             this.generateButton.Text = "Сформировать";
             this.generateButton.UseVisualStyleBackColor = true;
+            this.generateButton.Click += new System.EventHandler(this.generateButton_Click);
             // 
             // DebtorListControl
             // 

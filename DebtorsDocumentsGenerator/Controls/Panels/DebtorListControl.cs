@@ -4,11 +4,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using DBWorkLB;
 using AdvancedFunctions;
 using System.Threading;
+using Logging;
 
 namespace DebtorsDocumentsGenerator
 {
@@ -38,7 +38,7 @@ namespace DebtorsDocumentsGenerator
                 {
                     var debtorsList = ImportDebtorsOperations.GetPersonListFromDocumentTable((string)e.Argument);
 
-                    if (debtorsList.Count > 0)
+                    if (debtorsList?.Count > 0)
                     {
                         var dialogResult = MessageBox.Show(
                             $"Будет добавлено {debtorsList.Count} записей. Продолжить?", "Импорт должников", 
@@ -70,10 +70,10 @@ namespace DebtorsDocumentsGenerator
                                         '{debtor.Secondname}', 
                                         '{debtor.AccountNumber}',
                                         '{debtor.ResidencePlace}',
-                                        {debtor.HouseNumber},
+                                        '{debtor.HouseNumber}',
                                         '{debtor.Street}',
                                         {debtor.RoomNumber},
-                                        {debtor.ShareRight});");
+                                        '{debtor.ShareRight}');");
 
                                     var courtCase = debtor.Courtcases.FirstOrDefault();
                                     if (courtCase != null)
@@ -82,9 +82,11 @@ namespace DebtorsDocumentsGenerator
                                             $@"INSERT INTO " +
                                                 $"debtors_courtcases(" +
                                                     "debtor_id," +
-                                                    "period_start_date," +
-                                                    "period_end_date," +
+                                                    "debt_period_start_date," +
+                                                    "debt_period_end_date," +
                                                     "start_total_debt_sum, " +
+                                                    "penny_period_start_date," +
+                                                    "penny_period_end_date," +
                                                     "case_number," +
                                                     "recovered_main_amount_sum," +
                                                     "recovered_amount_penny," +
@@ -95,11 +97,13 @@ namespace DebtorsDocumentsGenerator
                                                 $")" +
                                                 $@"VALUES(
                                             LAST_INSERT_ID(),
-                                            '{(courtCase.PeriodStartDate != null ? Util.DateToString(courtCase.PeriodStartDate.Value) : "NULL")}',
-                                            '{(courtCase.PeriodEndDate != null ? Util.DateToString(courtCase.PeriodEndDate.Value) : "NULL")}',
-                                            '{courtCase.StartTotalDebtSum}',
+                                            '{(courtCase.DebtPeriodStartDate != null ? Util.DateToString(courtCase.DebtPeriodStartDate.Value) : "NULL")}',
+                                            '{(courtCase.DebtPeriodEndDate != null ? Util.DateToString(courtCase.DebtPeriodEndDate.Value) : "NULL")}',
+                                            '{courtCase.DebtSum}',
+                                            '{(courtCase.PennyPeriodStartDate != null ? Util.DateToString(courtCase.PennyPeriodStartDate.Value) : "NULL")}',
+                                            '{(courtCase.PennyPeriodEndDate != null ? Util.DateToString(courtCase.PennyPeriodStartDate.Value) : "NULL")}',
                                             '{courtCase.CaseNumber}',
-                                            '{Util.ConvertToString(courtCase.RecoveredMainAmountSum)}',
+                                            '{Util.ConvertToString(courtCase.TotalDebtSum)}',
                                             '{Util.ConvertToString(courtCase.RecoveredAmountPenny)}',
                                             '{Util.ConvertToString(courtCase.RecoveredGovernmentDuty)}',
                                             '{(courtCase.DesicionDate != null ? Util.DateToString(courtCase.DesicionDate.Value) : "NULL")}',
@@ -134,7 +138,8 @@ namespace DebtorsDocumentsGenerator
             }
             catch(Exception ex)
             {
-                MessageBox.Show($"Проблема при загрузке списка должников {ex.Message}");
+                InformOperations.setDisplayMessage($"Проблема при загрузке списка должников в БД:{ex.Message}", icon: ToolTipIcon.Warning);
+                Logger.Write($"Проблема при загрузке списка должников в БД:{ex.Message}");
             }
         }
 
@@ -156,28 +161,43 @@ namespace DebtorsDocumentsGenerator
 
         private void LoadDGData()
         {
-            debtorsListBS.DataSource = DBSource.debtorsCommonDt;
-            debtors_dg.DataSource = debtorsListBS;
+            try
+            {
+                if (DBSource.debtorsCommonDt != null)
+                {
+                    debtorsListBS.DataSource = DBSource.debtorsCommonDt;
+                    debtors_dg.DataSource = debtorsListBS;
 
-            debtors_dg.Columns["debtor_id"].Visible = false;
-            debtors_dg.Columns["account_number"].HeaderText = "Номер лицевого счёта";
-            debtors_dg.Columns["debtor_fio"].HeaderText = "ФИО";
-            debtors_dg.Columns["debtor_fio"].Width = 210;
-            debtors_dg.Columns["residence_place"].HeaderText = "Населённый пункт";
-            debtors_dg.Columns["house_number"].HeaderText = "Дом";
-            debtors_dg.Columns["street"].HeaderText = "Улица";
-            debtors_dg.Columns["room_number"].HeaderText = "Квартира";
-            debtors_dg.Columns["share_right"].HeaderText = "Доля в праве";
-            debtors_dg.Columns["period_start_date"].HeaderText = "Начало периода";
-            debtors_dg.Columns["period_end_date"].HeaderText = "Конец периода";
-            debtors_dg.Columns["start_total_debt_sum"].HeaderText = "Изначальная сумма долга";
-            debtors_dg.Columns["case_number"].HeaderText = "Номер дела";
-            debtors_dg.Columns["recovered_main_amount_sum"].HeaderText = "Взысканная сумма долга";
-            debtors_dg.Columns["recovered_amount_penny"].HeaderText = "Взысканная сумма пенни";
-            debtors_dg.Columns["recovered_government_duty"].HeaderText = "Взысканная сумма гос. пошлины";
-            debtors_dg.Columns["desicion_date"].HeaderText = "Дата принятия судом решения";
-            debtors_dg.Columns["decision_start_date"].HeaderText = "Дата вступления решения в законную силу";
-            debtors_dg.Columns["decision_end_date"].HeaderText = "Дата отмены решения";
+                    debtors_dg.Columns["debtor_id"].Visible = false;
+                    debtors_dg.Columns["account_number"].HeaderText = "Номер лицевого счёта";
+                    debtors_dg.Columns["debtor_fio"].HeaderText = "ФИО";
+                    debtors_dg.Columns["debtor_fio"].Width = 210;
+                    debtors_dg.Columns["lastname"].Visible = false;
+                    debtors_dg.Columns["name"].Visible = false;
+                    debtors_dg.Columns["secondname"].Visible = false;
+                    debtors_dg.Columns["residence_place"].HeaderText = "Населённый пункт";
+                    debtors_dg.Columns["house_number"].HeaderText = "Дом";
+                    debtors_dg.Columns["street"].HeaderText = "Улица";
+                    debtors_dg.Columns["room_number"].HeaderText = "Квартира";
+                    debtors_dg.Columns["share_right"].HeaderText = "Доля в праве";
+                    debtors_dg.Columns["start_total_debt_sum"].HeaderText = "Изначальная сумма долга";
+                    debtors_dg.Columns["case_number"].Visible = false;
+                    debtors_dg.Columns["recovered_main_amount_sum"].HeaderText = "Общая сумма долга";
+                    debtors_dg.Columns["debt_period_start_date"].HeaderText = "Начало периода";
+                    debtors_dg.Columns["debt_period_end_date"].HeaderText = "Конец периода";
+                    debtors_dg.Columns["recovered_amount_penny"].HeaderText = "Cумма пенни";
+                    debtors_dg.Columns["penny_period_start_date"].HeaderText = "Начало периода";
+                    debtors_dg.Columns["penny_period_end_date"].HeaderText = "Конец периода";
+                    debtors_dg.Columns["recovered_government_duty"].HeaderText = "Сумма гос. пошлины";
+                    debtors_dg.Columns["desicion_date"].Visible = false;
+                    debtors_dg.Columns["decision_start_date"].Visible = false;
+                    debtors_dg.Columns["decision_end_date"].Visible = false;
+                }
+            }
+            catch(Exception ex)
+            {
+                InformOperations.setDisplayMessage($"Ошибка при формировании списка должников: {ex.Message}");
+            }
         }
 
         private void DebtorListControl_Load(object sender, EventArgs e)
@@ -188,7 +208,6 @@ namespace DebtorsDocumentsGenerator
         private void importDebtorsButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            //ofd.InitialDirectory = Directory.GetParent(Environment.CurrentDirectory).FullName + "\\Шаблоны";
             ofd.Filter = "(*.xls;*.xlsx;*.csv)|*.xls;*.xlsx;*.csv";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
@@ -232,7 +251,7 @@ namespace DebtorsDocumentsGenerator
                                     if (result)
                                     {
                                         var forDeleteInds = new List<int>();
-                                        Action updateDGData = new Action(delegate {
+                                        Action minUpdateDGData = new Action(delegate {
                                             foreach (var row in DBSource.debtorsCommonDt.Rows.Cast<DataRow>())
                                             {
                                                 if (idsList.Contains(row.Field<int>("debtor_id")))
@@ -247,13 +266,34 @@ namespace DebtorsDocumentsGenerator
                                                 debtors_dg.Refresh();
                                             }
                                         });
-                                        if (debtors_dg.InvokeRequired)
+
+                                        Action maxUpdateDGData = new Action(delegate
                                         {
-                                            debtors_dg.Invoke(updateDGData);
+                                            debtors_dg.DataSource = null;
+                                            DBSourceLogic.UpdateTable(TableNames.debtors_common_local);
+                                            LoadDGData();
+                                        });
+                                        if (idsList.Count <= 10)
+                                        {
+                                            if (debtors_dg.InvokeRequired)
+                                            {
+                                                debtors_dg.Invoke(minUpdateDGData);
+                                            }
+                                            else
+                                            {
+                                                minUpdateDGData();
+                                            }
                                         }
                                         else
                                         {
-                                            updateDGData();
+                                            if (debtors_dg.InvokeRequired)
+                                            {
+                                                debtors_dg.Invoke(maxUpdateDGData);
+                                            }
+                                            else
+                                            {
+                                                maxUpdateDGData();
+                                            }
                                         }
                                         InformOperations.setDisplayMessage("Данные обновлены", "Удаление записей", ToolTipIcon.Info);
                                     }
@@ -280,6 +320,114 @@ namespace DebtorsDocumentsGenerator
             if  (e.KeyCode == Keys.Delete)
             {
                 DeleteSelectedRows();
+            }
+        }
+
+        private void generateButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (debtors_dg.SelectedRows.Count > 0)
+                {
+                    Action act = new Action(delegate {
+                        List<Debtor> debtors = new List<Debtor>();
+                        foreach (var row in debtors_dg.SelectedRows.Cast<DataGridViewRow>())
+                        {
+                            Debtor debtor = new Debtor()
+                            {
+                                FIO = row.Cells["debtor_fio"].Value.ToString(),
+                                Lastname = row.Cells["lastname"].Value.ToString(),
+                                Name = row.Cells["name"].Value.ToString(),
+                                Secondname = row.Cells["secondname"].Value.ToString(),
+                                AccountNumber = row.Cells["account_number"].Value.ToString(),
+                                ResidencePlace = row.Cells["residence_place"].Value.ToString(),
+                                Street = row.Cells["street"].Value.ToString(),
+                                HouseNumber = row.Cells["house_number"].Value.ToString(),
+                                RoomNumber =
+                                    !string.IsNullOrEmpty(row.Cells["room_number"].Value.ToString()) ? int.Parse(row.Cells["room_number"].Value.ToString()) : -1,
+                                ShareRight = row.Cells["share_right"].Value.ToString(),
+                            };
+                            debtor.Courtcases = new List<DebtorCourtcase>();
+                            var courtcase = new DebtorCourtcase()
+                            {
+                                DebtSum =
+                                    !string.IsNullOrEmpty(row.Cells["start_total_debt_sum"].Value.ToString()) ? Util.ConvertToDecimal(row.Cells["start_total_debt_sum"].Value.ToString()) : 0,
+                                CaseNumber = row.Cells["case_number"].Value.ToString(),
+                                RecoveredAmountPenny =
+                                    !string.IsNullOrEmpty(row.Cells["recovered_amount_penny"].Value.ToString()) ? Util.ConvertToDecimal(row.Cells["recovered_amount_penny"].Value.ToString()) : -1,
+                                RecoveredGovernmentDuty =
+                                     !string.IsNullOrEmpty(row.Cells["recovered_government_duty"].Value.ToString()) ? Util.ConvertToDecimal(row.Cells["recovered_government_duty"].Value.ToString()) : -1,
+                                TotalDebtSum =
+                                     !string.IsNullOrEmpty(row.Cells["recovered_main_amount_sum"].Value.ToString()) ? Util.ConvertToDecimal(row.Cells["recovered_main_amount_sum"].Value.ToString()) : -1
+                            };
+                            if (!string.IsNullOrEmpty(row.Cells["debt_period_start_date"].Value.ToString()))
+                            {
+                                try
+                                {
+                                    courtcase.DebtPeriodStartDate = DateTime.Parse(row.Cells["debt_period_start_date"].Value.ToString());
+                                }
+                                catch
+                                {
+                                    courtcase.DebtPeriodStartDate = null;
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(row.Cells["debt_period_end_date"].Value.ToString()))
+                            {
+                                try
+                                {
+                                    courtcase.DebtPeriodEndDate = DateTime.Parse(row.Cells["debt_period_end_date"].Value.ToString());
+                                }
+                                catch
+                                {
+                                    courtcase.DebtPeriodEndDate = null;
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(row.Cells["penny_period_start_date"].Value.ToString()))
+                            {
+                                try
+                                {
+                                    courtcase.PennyPeriodStartDate = DateTime.Parse(row.Cells["penny_period_start_date"].Value.ToString());
+                                }
+                                catch
+                                {
+                                    courtcase.PennyPeriodStartDate = null;
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(row.Cells["penny_period_end_date"].Value.ToString()))
+                            {
+                                try
+                                {
+                                    courtcase.PennyPeriodEndDate = DateTime.Parse(row.Cells["penny_period_end_date"].Value.ToString());
+                                }
+                                catch
+                                {
+                                    courtcase.PennyPeriodEndDate = null;
+                                }
+                            }
+                            debtor.Courtcases.Add(courtcase);
+                            debtors.Add(debtor);
+                        }
+                        TemplateChoice tch = new TemplateChoice(debtors);
+                        tch.ShowDialog();
+                    });
+                    InformOperations.setDisplayMessage("Осуществляется подборка данных должников", "Формирование документов", ToolTipIcon.Info);
+                    Thread th = new Thread(delegate()
+                    {
+                        if (debtors_dg.InvokeRequired)
+                        {
+                            debtors_dg.Invoke(act);
+                        }
+                        else
+                        {
+                            act();
+                        }
+                    });
+                    th.Start();
+                }
+            }
+            catch(Exception ex)
+            {
+                InformOperations.setDisplayMessage($"Ошибка при запуске окна генерации документов: {ex.Message}");
             }
         }
     }
