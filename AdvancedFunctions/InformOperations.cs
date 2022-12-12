@@ -24,5 +24,6 @@ namespace AdvancedFunctions
 
         public delegate void SetDisplayMessage(string message, string title = "Генератор документов: возникла проблема", ToolTipIcon icon = ToolTipIcon.Error);
         public static SetDisplayMessage setDisplayMessage;
+        public static SetDisplayMessage setDisplayLoginFormMessage;
     }
 }

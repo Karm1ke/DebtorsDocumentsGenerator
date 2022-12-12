@@ -304,6 +304,26 @@ namespace AdvancedFunctions
             }
         }
 
+        public static string GetOnlyLetter(string str)
+        {
+            try
+            {
+                string newStr = "";
+                foreach (char c in str)
+                {
+                    if (char.IsLetter(c))
+                    {
+                        newStr += c;
+                    }
+                }
+                return newStr;
+            }
+            catch
+            {
+                return str;
+            }
+        }
+
         /// <summary>
         /// Проверка, содержит ли строка числа
         /// </summary>

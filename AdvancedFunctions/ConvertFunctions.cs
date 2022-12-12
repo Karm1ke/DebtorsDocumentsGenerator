@@ -21,7 +21,7 @@ namespace AdvancedFunctions
             string day = dateTime.Day.ToString();
             int hours = dateTime.Hour;
             int minutes = dateTime.Minute;
-            string dt = $"{year}-{month}-{day} {hours}:{minutes}";
+            string dt = $"{year}-{month}-{day} {hours}-{minutes}";
             return dt;
         }
 
