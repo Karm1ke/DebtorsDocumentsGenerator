@@ -1,5 +1,6 @@
 ﻿using AdvancedFunctions;
 using DBWorkLB;
+using Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -86,7 +87,7 @@ namespace DebtorsDocumentsGenerator
                                                 debtor.Street = valueStr;
                                                 break;
                                             case "№ Дома":
-                                                debtor.HouseNumber = int.Parse(valueStr);
+                                                debtor.HouseNumber = valueStr;
                                                 break;
                                             case "№ квартиры":
                                                 debtor.RoomNumber = int.Parse(valueStr);
@@ -104,15 +105,11 @@ namespace DebtorsDocumentsGenerator
                                                 }    
                                                 break;
                                             case "Доля в праве":
-                                                debtor.ShareRight = int.Parse(valueStr);
+                                                debtor.ShareRight = valueStr;
                                                 break;
                                             case "Запрос о получении выписки направлен":
                                                 break;
                                             case "Заказчику":
-                                                break;
-                                            case "Первоначальная общая сумма долга":
-                                                debtorCourtcase.StartTotalDebtSum = 
-                                                    Util.ConvertToDecimal(valueStr);
                                                 break;
                                             case "Наименования суда (№ судебного участка)":
                                                 break;
@@ -121,37 +118,38 @@ namespace DebtorsDocumentsGenerator
                                             case "№ дела":
                                                 debtor.Courtcases.First().CaseNumber = valueStr;
                                                 break;
-                                            case "Взысканная судом сумма основного долга, руб.":
-                                                if (!string.IsNullOrEmpty(valueStr))
-                                                {
-                                                    debtorCourtcase.RecoveredMainAmountSum =
-                                                        Util.ConvertToDecimal(valueStr);
-                                                }
-                                                break;
-                                            case "Взысканная судом сумма пени, руб. ":
-                                                if (!string.IsNullOrEmpty(valueStr))
-                                                {
-                                                    debtorCourtcase.RecoveredAmountPenny =
-                                                        Util.ConvertToDecimal(valueStr);
-                                                }
-                                                break;
-                                            case "Взысканная судом сумма государственной пошлины, руб.":
-                                                if (!string.IsNullOrEmpty(valueStr))
-                                                {
-                                                    debtorCourtcase.RecoveredGovernmentDuty =
-                                                        Util.ConvertToDecimal(valueStr);
-                                                }
-                                                break;
                                             case "Начала периода":
-                                                if (!string.IsNullOrEmpty(valueStr))
+                                                if (!string.IsNullOrEmpty(valueStr) && j > 1)
                                                 {
-                                                    debtorCourtcase.PeriodStartDate = DateTime.Parse(valueStr);
+                                                    if (valueStr.Split('.').Length > 1 && valueStr.Split('.').Last().Length > 2)
+                                                    {
+                                                        string reasonColumnName = dt.Rows[0][j - 1].ToString();
+                                                        if (reasonColumnName.IndexOf("сумма основного долга", StringComparison.OrdinalIgnoreCase) != -1)
+                                                        {
+                                                            debtorCourtcase.DebtPeriodStartDate = DateTime.Parse(valueStr);
+                                                        }
+                                                        else if (reasonColumnName.IndexOf("сумма пени", StringComparison.OrdinalIgnoreCase) != -1)
+                                                        {
+                                                            debtorCourtcase.PennyPeriodStartDate = DateTime.Parse(valueStr);
+                                                        }
+                                                    }
                                                 }
                                                 break;
                                             case "Конец периода":
-                                                if (!string.IsNullOrEmpty(valueStr))
+                                                if (!string.IsNullOrEmpty(valueStr) && j > 2)
                                                 {
-                                                    debtorCourtcase.PeriodEndDate = DateTime.Parse(valueStr);
+                                                    if (valueStr.Split('.').Length > 1 && valueStr.Split('.').Last().Length > 2)
+                                                    {
+                                                        string reasonColumnName = dt.Rows[0][j - 2].ToString();
+                                                        if (reasonColumnName.IndexOf("сумма основного долга", StringComparison.OrdinalIgnoreCase) != -1)
+                                                        {
+                                                            debtorCourtcase.DebtPeriodEndDate = DateTime.Parse(valueStr);
+                                                        }
+                                                        else if (reasonColumnName.IndexOf("сумма пени", StringComparison.OrdinalIgnoreCase) != -1)
+                                                        {
+                                                            debtorCourtcase.PennyPeriodEndDate = DateTime.Parse(valueStr);
+                                                        }
+                                                    }
                                                 }
                                                 break;
                                             case "Дата принятия судом решения":
@@ -174,12 +172,46 @@ namespace DebtorsDocumentsGenerator
                                                 break;
 
                                         }
+
+                                        if (columnName.IndexOf("общая сумма долга", StringComparison.OrdinalIgnoreCase) != -1)
+                                        {
+                                            if (!string.IsNullOrEmpty(valueStr))
+                                            {
+                                                debtorCourtcase.TotalDebtSum =
+                                                    Util.ConvertToDecimal(valueStr);
+                                            }
+                                        }
+                                        if (columnName.IndexOf("сумма основного долга", StringComparison.OrdinalIgnoreCase) != -1)
+                                        {
+                                            if (!string.IsNullOrEmpty(valueStr))
+                                            {
+                                                debtorCourtcase.DebtSum =
+                                                    Util.ConvertToDecimal(valueStr);
+                                            }
+                                        }
+                                        if (columnName.IndexOf("сумма пени", StringComparison.OrdinalIgnoreCase) != -1)
+                                        {
+                                            if (!string.IsNullOrEmpty(valueStr))
+                                            {
+                                                debtorCourtcase.RecoveredAmountPenny =
+                                                    Util.ConvertToDecimal(valueStr);
+                                            }
+                                        }
+                                        if (columnName.IndexOf("сумма государственной пошлины", StringComparison.OrdinalIgnoreCase) != -1)
+                                        {
+                                            if (!string.IsNullOrEmpty(valueStr))
+                                            {
+                                                debtorCourtcase.RecoveredGovernmentDuty =
+                                                    Util.ConvertToDecimal(valueStr);
+                                            }
+                                        }
                                     }
                                 }
 
                                 debtorsList.Add(debtor);
                             });
                         }
+                        debtorsList = debtorsList.Where(d =>d != null && d.Lastname != null || d.Name != null || d.Secondname != null).ToList();
                         return debtorsList;
                     }
                 }
@@ -187,6 +219,7 @@ namespace DebtorsDocumentsGenerator
             catch(Exception ex)
             {
                 InformOperations.setDisplayMessage(message:$"Ошибка при импорте из Excel-файла: {ex.Message}", icon:ToolTipIcon.Error);
+                Logger.Write($"Ошибка при импорте из Excel-файла: {ex.Message}; {ex.Message}");
             }
             return null;
         }
