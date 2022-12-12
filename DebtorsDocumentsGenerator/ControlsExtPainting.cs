@@ -107,7 +107,7 @@ namespace DebtorsDocumentsGenerator
                     }
                     foreach (var button in form.Controls.OfType<Button>())
                     {
-                        button.BackColor = button.Enabled ? Color.FromArgb(44, 44, 44) : Color.FromArgb(25, 25, 25);
+                        button.BackColor = button.Enabled ? Color.LightSlateGray : Color.FromArgb(25, 25, 25);
                         button.ForeColor = button.Enabled ? Color.White : Color.Gray;
                     }
                     foreach (var mtbox in form.Controls.OfType<MaskedTextBox>())
