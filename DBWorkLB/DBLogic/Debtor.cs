@@ -37,7 +37,7 @@ namespace DBWorkLB
         /// <summary>
         /// Номер квартиры
         /// </summary>
-        public int RoomNumber { get; set; }
+        public string RoomNumber { get; set; }
         /// <summary>
         /// Доля в праве
         /// </summary>

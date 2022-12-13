@@ -72,7 +72,7 @@ namespace DebtorsDocumentsGenerator
                                         '{debtor.ResidencePlace}',
                                         '{debtor.HouseNumber}',
                                         '{debtor.Street}',
-                                        {debtor.RoomNumber},
+                                        '{debtor.RoomNumber}',
                                         '{debtor.ShareRight}');");
 
                                     var courtCase = debtor.Courtcases.FirstOrDefault();
@@ -82,6 +82,7 @@ namespace DebtorsDocumentsGenerator
                                             $@"INSERT INTO " +
                                                 $"debtors_courtcases(" +
                                                     "debtor_id," +
+                                                    "register_number," +
                                                     "debt_period_start_date," +
                                                     "debt_period_end_date," +
                                                     "start_total_debt_sum, " +
@@ -97,9 +98,10 @@ namespace DebtorsDocumentsGenerator
                                                 $")" +
                                                 $@"VALUES(
                                             LAST_INSERT_ID(),
+                                            {courtCase.RegisterNumber},
                                             '{(courtCase.DebtPeriodStartDate != null ? Util.DateToString(courtCase.DebtPeriodStartDate.Value) : "NULL")}',
                                             '{(courtCase.DebtPeriodEndDate != null ? Util.DateToString(courtCase.DebtPeriodEndDate.Value) : "NULL")}',
-                                            '{courtCase.DebtSum}',
+                                            '{Util.ConvertToString(courtCase.DebtSum)}',
                                             '{(courtCase.PennyPeriodStartDate != null ? Util.DateToString(courtCase.PennyPeriodStartDate.Value) : "NULL")}',
                                             '{(courtCase.PennyPeriodEndDate != null ? Util.DateToString(courtCase.PennyPeriodStartDate.Value) : "NULL")}',
                                             '{courtCase.CaseNumber}',
@@ -169,6 +171,7 @@ namespace DebtorsDocumentsGenerator
                     debtors_dg.DataSource = debtorsListBS;
 
                     debtors_dg.Columns["debtor_id"].Visible = false;
+                    debtors_dg.Columns["register_number"].Visible = false;
                     debtors_dg.Columns["account_number"].HeaderText = "Номер лицевого счёта";
                     debtors_dg.Columns["debtor_fio"].HeaderText = "ФИО";
                     debtors_dg.Columns["debtor_fio"].Width = 210;
@@ -343,8 +346,7 @@ namespace DebtorsDocumentsGenerator
                                 ResidencePlace = row.Cells["residence_place"].Value.ToString(),
                                 Street = row.Cells["street"].Value.ToString(),
                                 HouseNumber = row.Cells["house_number"].Value.ToString(),
-                                RoomNumber =
-                                    !string.IsNullOrEmpty(row.Cells["room_number"].Value.ToString()) ? int.Parse(row.Cells["room_number"].Value.ToString()) : -1,
+                                RoomNumber = row.Cells["room_number"].Value.ToString(),
                                 ShareRight = row.Cells["share_right"].Value.ToString(),
                             };
                             debtor.Courtcases = new List<DebtorCourtcase>();

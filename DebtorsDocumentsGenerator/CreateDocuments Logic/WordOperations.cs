@@ -204,7 +204,16 @@ namespace DebtorsDocumentsGenerator
                 string appVersion = "";
 
                 string fileName = $"{Util.GetOnlyLetter(debtor.FIO.Replace(" ", "-")).Trim()}_{Util.DateTimeToString(DateTime.Now)}";
-                string directoryPath = $"{SaveDirectoryPath}\\{debtor.ResidencePlace} {debtor.Street} {debtor.HouseNumber}-{debtor.RoomNumber}";
+                string roomNumber = "";
+                if (debtor.RoomNumber.Length <= 3)
+                {
+                    roomNumber = debtor.RoomNumber;
+                }
+                else
+                {
+                    roomNumber = Util.GetDigit(debtor.RoomNumber, usePunctuationMarks: true);
+                }
+                string directoryPath = $"{SaveDirectoryPath}\\{debtor.ResidencePlace} {debtor.Street} {debtor.HouseNumber}-{roomNumber}";
                 if (!Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);

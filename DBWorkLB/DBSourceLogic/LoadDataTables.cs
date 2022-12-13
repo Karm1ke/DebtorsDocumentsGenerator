@@ -38,6 +38,7 @@ namespace DBWorkLB
                         debtors_passport_data.lastname,
                         debtors_passport_data.name,
                         debtors_passport_data.secondname,
+                        debtors_courtcases.register_number,
 	                    debtors_passport_data.account_number,
 	                    debtors_passport_data.residence_place, 
 	                    debtors_passport_data.street,
@@ -57,7 +58,8 @@ namespace DBWorkLB
 	                    CAST(debtors_courtcases.decision_start_date AS CHAR) AS decision_start_date,
 	                    CAST(debtors_courtcases.decision_cancel_date AS CHAR) AS decision_end_date 
                     FROM debtors_passport_data
-                    JOIN debtors_courtcases ON debtors_passport_data.debtor_id = debtors_courtcases.debtor_id";
+                    JOIN debtors_courtcases ON debtors_passport_data.debtor_id = debtors_courtcases.debtor_id
+                    ORDER BY debtors_courtcases.register_number";
             public static string selectTemplates = "SELECT * FROM templates";
             public static string selectGenerationLog = "SELECT * FROM generation_log";
         }

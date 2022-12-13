@@ -4,6 +4,7 @@ namespace DBWorkLB
 {
     public class DebtorCourtcase
     {
+        public int RegisterNumber { get; set; }
         /// <summary>
         /// Cумма долга
         /// </summary>
