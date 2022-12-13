@@ -53,5 +53,11 @@ namespace AdvancedFunctions
             string str = dec.ToString().Replace(",", ".");
             return str;
         }
+
+        public static string ReverseConvertToString(object dec)
+        {
+            string str = dec.ToString().Replace(".", ",");
+            return str;
+        }
     }
 }

@@ -284,7 +284,7 @@ namespace AdvancedFunctions
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string GetDigit(string str)
+        public static string GetDigit(string str, bool usePunctuationMarks = false)
         {
             try
             {
@@ -294,6 +294,13 @@ namespace AdvancedFunctions
                     if (char.IsDigit(c))
                     {
                         newStr += c;
+                    }
+                    else if (usePunctuationMarks)
+                    {
+                        if (c == '.' || c == ',' || c == '-')
+                        {
+                            newStr += c;
+                        }
                     }
                 }
                 return newStr;
@@ -332,7 +339,22 @@ namespace AdvancedFunctions
         public static bool isDigit(string str)
         {
             int digitCount = 0;
-            digitCount = str.Count(s => Char.IsDigit(s));
+            digitCount = str.Count(s => Char.IsDigit(s) );
+            if (digitCount == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+
+        public static bool isDecimal(string str)
+        {
+            int digitCount = 0;
+            digitCount = str.Count(s => Char.IsDigit(s) || s == '.' || s == ',');
             if (digitCount == 0)
             {
                 return false;
