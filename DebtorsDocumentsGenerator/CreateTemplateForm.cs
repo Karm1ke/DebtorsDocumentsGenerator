@@ -215,14 +215,18 @@ namespace DebtorsDocumentsGenerator
 
         private void createButton_Click(object sender, EventArgs e)
         {
-            creationBW.RunWorkerAsync(new WorkerArguments() { 
-                title = titleBox.Text,
-                ftpHeaderFileName = headerTextFileBox.Text,
-                ftpMainFileName = mainTextFileBox.Text,
-                ftpSubFileName = subTextFileBox.Text,
-                local = localCheckBox.Checked,
-                typeIndex = doctypeComboBox.SelectedIndex
-            });
+            if (!creationBW.IsBusy)
+            {
+                creationBW.RunWorkerAsync(new WorkerArguments()
+                {
+                    title = titleBox.Text,
+                    ftpHeaderFileName = headerTextFileBox.Text,
+                    ftpMainFileName = mainTextFileBox.Text,
+                    ftpSubFileName = subTextFileBox.Text,
+                    local = localCheckBox.Checked,
+                    typeIndex = doctypeComboBox.SelectedIndex
+                });
+            }
         }
 
         private void doctypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
